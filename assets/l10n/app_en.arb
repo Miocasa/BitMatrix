@@ -1,0 +1,241 @@
+{
+  "@@locale": "en",
+
+  "appTitle": "BitMatrix",
+
+  "tabHome": "Home",
+  "tabFavourite": "Favourite",
+  "tabSettings": "Settings",
+
+  "loginTitle": "Welcome Back!",
+  "loginSubtitle": "Please sign in to continue",
+  "loginEmailLabel": "Email",
+  "loginEmailHint": "you@example.com",
+  "loginEmailError": "Please enter a valid email",
+  "loginPasswordLabel": "Password",
+  "loginPasswordHint": "Enter your password",
+  "loginPasswordError": "Please enter your password",
+  "loginForgotPassword": "Forgot Password?",
+  "loginForgotPasswordClicked": "Forgot Password clicked!",
+  "loginButton": "Login",
+  "loginNoAccount": "Don't have an account?",
+  "loginSignUpLink": "Sign Up",
+  "loginFailed": "Login failed. Check your credentials.",
+
+  "signUpTitle": "Create Account",
+  "signUpSubtitle": "Join us by filling out the form below",
+  "signUpNicknameLabel": "Nickname",
+  "signUpNicknameHint": "Your nickname",
+  "signUpNicknameErrorEmpty": "Please enter a valid name",
+  
+  "signUpEmailLabel": "Email",
+  "signUpEmailHint": "you@example.com",
+  "signUpEmailError": "Please enter a valid email",
+  "signUpPasswordLabel": "Password",
+  "signUpPasswordHint": "Create a strong password",
+  "signUpPasswordErrorEmpty": "Please enter a password",
+  "signUpPasswordErrorShort": "Password must be at least 6 characters",
+  "signUpConfirmPasswordLabel": "Confirm Password",
+  "signUpConfirmPasswordHint": "Re-enter your password",
+  "signUpConfirmPasswordErrorEmpty": "Please confirm your password",
+  "signUpConfirmPasswordErrorNotMatch": "Passwords do not match",
+  "signUpButton": "Sign Up",
+  "signUpAlreadyHaveAccount": "Already have an account?",
+  "signUpLoginLink": "Login",
+  "signUpFailed": "Sign up failed. Please try again or use a different email.",
+  "signUpSuccess": "Account created successfully! Please log in.",
+
+
+
+
+  "homeSearchHint": "Search courses...",
+  "homeSearchCloseTooltip": "Close Search",
+  "homeSearchClearTooltip": "Clear Search",
+  "homeSearchTooltip": "Search Courses",
+  "homeSettingsTooltip": "Settings",
+  "homeNoCourses": "No courses available. Try adding sample data.",
+  "homeNoCoursesForQuery": "No courses found for \"{query}\".",
+  "@homeNoCoursesForQuery": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "homeTryDifferentTerm": "Try a different search term.",
+  "homeSampleDataLabel": "Sample Data",
+  "homeLearningProgressTitle": "Learning progress",
+  "homeInnerProgressLabel": "{days} days streak",
+  "@homeInnerProgressLabel": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "homeOuterProgressLabel": "Points: {points}",
+  "@homeOuterProgressLabel": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "homeTodayPoints": "Points for today",
+  "homeStreakDays": "Streak days",
+  "homeStatusDone": "Congrats, you have completed your study plan!🎉",
+  "homeStatusAlmost": "You are almost at your goal 👍",
+  "homeStatusFewLessons": "Just a few more lessons 👾",
+  "homeStatusGoodStart": "Good start 🤠",
+  "homeStatusStart": "Time to start 😸",
+
+
+  
+
+  "myCoursesLoginToSee": "Please log in to see your courses.",
+  "myCoursesErrorWithReason": "Error: {reason}",
+  "@myCoursesErrorWithReason": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "myCoursesEmptyTitle": "You are not enrolled in any courses yet.",
+  "myCoursesEmptySubtitle": "Explore available courses and start learning!",
+
+
+  "courseEnrollmentLoginRequired": "Please log in to enroll and view lessons.",
+  "courseLessonsTitle": "Lessons",
+  "courseNoLessons": "No lessons available for this course yet.",
+  "courseLoginToAccessLessons": "Log in to enroll and access lessons.",
+  "courseEnrollToViewLessons": "Enroll in the course to view lessons.",
+  "coursePleaseEnrollToWatchLesson": "Please enroll to watch this lesson.",
+  "coursePleaseEnrollToViewContent": "Please enroll to view lesson content.",
+  "courseLoading": "Loading...",
+  "courseNotFound": "Course not found or error loading.",
+  "courseInstructor": "Instructor: {name}",
+  "@courseInstructor": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "courseConfirmUnenrollTitle": "Confirm Unenrollment",
+  "courseConfirmUnenrollBody": "Are you sure you want to unenroll from \"{title}\"? Your progress will be lost.",
+  "@courseConfirmUnenrollBody": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "courseDialogCancel": "Cancel",
+  "courseDialogUnenroll": "Unenroll",
+  "courseUnenrollSuccess": "Successfully unenrolled!",
+  "courseEnrollSuccess": "Successfully enrolled!",
+  "courseEnrollErrorWithReason": "Error: {reason}",
+  "@courseEnrollErrorWithReason": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "courseButtonUnenroll": "Unenroll from Course",
+  "courseButtonEnroll": "Enroll in Course",
+
+ 
+  "courseCardCompleted": "Completed",
+  "courseCardViewCourse": "View Course",
+  "courseCardTapForDetails": "Tap to view details",
+
+  
+
+
+
+
+
+
+  "settingsTitle": "Settings",
+  "settingsConfirmLogoutTitle": "Confirm Logout",
+  "settingsConfirmLogoutBody": "Are you sure you want to log out?",
+  "settingsCancel": "Cancel",
+  "settingsLogout": "Log Out",
+  "settingsAppearanceSection": "Appearance",
+  "settingsLightMode": "Light Mode",
+  "settingsDarkMode": "Dark Mode",
+  "settingsSystemMode": "System Default",
+  "settingsPrimaryColorSection": "Primary Color",
+  "settingsPrimaryColorHint": "Select your preferred app color:",
+  "settingsAccountSection": "Account",
+  "settingsAboutSection": "About",
+  "settingsAboutAppTitle": "About App",
+  
+  "settingsAboutAppSubtitle": "Version {reason}",
+  "@settingsAboutAppSubtitle": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+
+  "settingsAboutAppName": "TeckOqu",
+  "settingsAboutAppVersion": "1.0.2",
+  "settingsAboutAppLegalese": "© {year} MioSpace",
+  "@settingsAboutAppLegalese": {
+    "placeholders": {
+      "year": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsAboutAppDescription": "This is a great course application built with Flutter and accessible for everyone.",
+  "settingsLogoutFailedWithReason": "Logout failed: {reason}",
+  "@settingsLogoutFailedWithReason": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+
+  "profileLoginToSee": "Please log in to see your profile.",
+  "profileLoadErrorWithReason": "Error loading profile: {reason}",
+  "@profileLoadErrorWithReason": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "profileNotFound": "Profile not found.",
+  "profileNameNotSet": "Name not set",
+  "profileStreakChip": "{days, plural, one {# day streak} other {# days streak}}",
+  "@profileStreakChip": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "profileEditSoon": "Profile editing will be available soon",
+
+  "markdownLoadError": "Failed to load document",
+  "markdownTocUnavailable": "Table of contents is not available",
+
+  "videoErrorLoading": "Error loading video: {reason}",
+  "@videoErrorLoading": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "videoUrlNotSupported": "Video URL is not set or not supported.",
+  "videoLoadFailed": "Failed to load video.",
+
+  "authErrorGeneric": "Authentication error. Please restart."
+}

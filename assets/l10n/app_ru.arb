@@ -1,0 +1,226 @@
+{
+  "@@locale": "ru",
+
+  "appTitle": "Teck Oqu",
+
+  "tabHome": "Главная",
+  "tabMyCourses": "Мои курсы",
+  "tabProfile": "Профиль",
+
+  "loginTitle": "С возвращением!",
+  "loginSubtitle": "Пожалуйста, войдите, чтобы продолжить",
+  "loginEmailLabel": "Email",
+  "loginEmailHint": "you@example.com",
+  "loginEmailError": "Пожалуйста, введите корректный email",
+  "loginPasswordLabel": "Пароль",
+  "loginPasswordHint": "Введите пароль",
+  "loginPasswordError": "Пожалуйста, введите пароль",
+  "loginForgotPassword": "Забыли пароль?",
+  "loginForgotPasswordClicked": "Кнопка восстановления пароля нажата!",
+  "loginButton": "Войти",
+  "loginNoAccount": "Нет аккаунта?",
+  "loginSignUpLink": "Зарегистрироваться",
+  "loginFailed": "Не удалось войти. Проверьте логин и пароль.",
+
+  "signUpTitle": "Создать аккаунт",
+  "signUpSubtitle": "Присоединяйтесь, заполнив форму ниже",
+  "signUpNicknameLabel": "Никнейм",
+  "signUpNicknameHint": "Ваш никнейм",
+  "signUpNicknameErrorEmpty": "Пожалуйста, введите корректное имя",
+  
+  "signUpEmailLabel": "Email",
+  "signUpEmailHint": "you@example.com",
+  "signUpEmailError": "Пожалуйста, введите корректный email",
+  "signUpPasswordLabel": "Пароль",
+  "signUpPasswordHint": "Создайте надёжный пароль",
+  "signUpPasswordErrorEmpty": "Пожалуйста, введите пароль",
+  "signUpPasswordErrorShort": "Пароль должен быть не менее 6 символов",
+  "signUpConfirmPasswordLabel": "Подтвердите пароль",
+  "signUpConfirmPasswordHint": "Повторно введите пароль",
+  "signUpConfirmPasswordErrorEmpty": "Пожалуйста, подтвердите пароль",
+  "signUpConfirmPasswordErrorNotMatch": "Пароли не совпадают",
+  "signUpButton": "Зарегистрироваться",
+  "signUpAlreadyHaveAccount": "Уже есть аккаунт?",
+  "signUpLoginLink": "Войти",
+  "signUpFailed": "Не удалось создать аккаунт. Попробуйте ещё раз или используйте другой email.",
+  "signUpSuccess": "Аккаунт успешно создан! Пожалуйста, войдите.",
+
+  "homeSearchHint": "Поиск курсов...",
+  "homeSearchCloseTooltip": "Закрыть поиск",
+  "homeSearchClearTooltip": "Очистить поиск",
+  "homeSearchTooltip": "Поиск курсов",
+  "homeSettingsTooltip": "Настройки",
+  "homeNoCourses": "Нет доступных курсов. Попробуйте добавить тестовые данные.",
+  "homeNoCoursesForQuery": "По запросу \"{query}\" курсов не найдено.",
+  "@homeNoCoursesForQuery": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "homeTryDifferentTerm": "Попробуйте изменить поисковый запрос.",
+  "homeSampleDataLabel": "Тестовые данные",
+  "homeLearningProgressTitle": "Прогресс обучения",
+  "homeInnerProgressLabel": "{days} дн. стрика",
+  "@homeInnerProgressLabel": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "homeOuterProgressLabel": "Очки: {points}",
+  "@homeOuterProgressLabel": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "homeTodayPoints": "Очки за сегодня",
+  "homeStreakDays": "Дни стрика",
+  "homeStatusDone": "Поздравляем, ты выполнил план учёбы!🎉",
+  "homeStatusAlmost": "Вы почти достигли цели 👍",
+  "homeStatusFewLessons": "Ещё пару уроков 👾",
+  "homeStatusGoodStart": "Хорошее начало 🤠",
+  "homeStatusStart": "Пора начать 😸",
+
+  "myCoursesLoginToSee": "Пожалуйста, войдите, чтобы увидеть ваши курсы.",
+  "myCoursesErrorWithReason": "Ошибка: {reason}",
+  "@myCoursesErrorWithReason": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "myCoursesEmptyTitle": "Вы ещё не записаны ни на один курс.",
+  "myCoursesEmptySubtitle": "Изучите доступные курсы и начните обучение!",
+
+  "courseEnrollmentLoginRequired": "Пожалуйста, войдите, чтобы записаться и просматривать уроки.",
+  "courseLessonsTitle": "Уроки",
+  "courseNoLessons": "Для этого курса ещё нет уроков.",
+  "courseLoginToAccessLessons": "Войдите, чтобы записаться и получить доступ к урокам.",
+  "courseEnrollToViewLessons": "Запишитесь на курс, чтобы просматривать уроки.",
+  "coursePleaseEnrollToWatchLesson": "Пожалуйста, запишитесь на курс, чтобы посмотреть этот урок.",
+  "coursePleaseEnrollToViewContent": "Пожалуйста, запишитесь на курс, чтобы просматривать содержание урока.",
+  "courseLoading": "Загрузка...",
+  "courseNotFound": "Курс не найден или произошла ошибка при загрузке.",
+  "courseInstructor": "Инструктор: {name}",
+  "@courseInstructor": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "courseConfirmUnenrollTitle": "Подтвердите отписку",
+  "courseConfirmUnenrollBody": "Вы уверены, что хотите отписаться от курса \"{title}\"? Ваш прогресс будет потерян.",
+  "@courseConfirmUnenrollBody": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "courseDialogCancel": "Отмена",
+  "courseDialogUnenroll": "Отписаться",
+  "courseUnenrollSuccess": "Вы успешно отписались!",
+  "courseEnrollSuccess": "Вы успешно записались!",
+  "courseEnrollErrorWithReason": "Ошибка: {reason}",
+  "@courseEnrollErrorWithReason": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "courseButtonUnenroll": "Отписаться от курса",
+  "courseButtonEnroll": "Записаться на курс",
+
+  "courseCardCompleted": "Завершён",
+  "courseCardViewCourse": "К курсу",
+  "courseCardTapForDetails": "Нажмите, чтобы посмотреть детали",
+
+  "settingsTitle": "Настройки",
+  "settingsConfirmLogoutTitle": "Подтвердите выход",
+  "settingsConfirmLogoutBody": "Вы уверены, что хотите выйти?",
+  "settingsCancel": "Отмена",
+  "settingsLogout": "Выйти",
+  "settingsAppearanceSection": "Оформление",
+  "settingsLightMode": "Светлая тема",
+  "settingsDarkMode": "Тёмная тема",
+  "settingsSystemMode": "Системная тема",
+  "settingsPrimaryColorSection": "Основной цвет",
+  "settingsPrimaryColorHint": "Предпочитаемый цвет интерфейса:",
+  "settingsAccountSection": "Аккаунт",
+  "settingsAboutSection": "О приложении",
+  "settingsAboutAppTitle": "О приложении",
+
+  "settingsAboutAppSubtitle": "Версия {reason}",
+  "@settingsAboutAppSubtitle": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsAboutAppName": "TeckOqu",
+  "settingsAboutAppVersion": "1.0.2",
+  "settingsAboutAppLegalese": "© {year} MioSpace",
+  "@settingsAboutAppLegalese": {
+    "placeholders": {
+      "year": {
+        "type": "int"
+      }
+    }
+  },
+  
+  "settingsAboutAppDescription": "Это отличное приложение для курсов, созданное на Flutter и доступное всем.",
+  "settingsLogoutFailedWithReason": "Не удалось выйти: {reason}",
+  "@settingsLogoutFailedWithReason": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+
+  "profileLoginToSee": "Пожалуйста, войдите, чтобы увидеть профиль.",
+  "profileLoadErrorWithReason": "Ошибка загрузки профиля: {reason}",
+  "@profileLoadErrorWithReason": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "profileNotFound": "Профиль не найден.",
+  "profileNameNotSet": "Имя не задано",
+  "profileStreakChip": "{days, plural, one {# день стрика} few {# дня стрика} many {# дней стрика} other {# дней стрика}}",
+  "@profileStreakChip": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "profileEditSoon": "Редактирование профиля скоро будет доступно",
+
+  "markdownLoadError": "Не удалось загрузить документ",
+  "markdownTocUnavailable": "Оглавление недоступно",
+
+  "videoErrorLoading": "Ошибка загрузки видео: {reason}",
+  "@videoErrorLoading": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "videoUrlNotSupported": "Видео URL не задан или не поддерживается.",
+  "videoLoadFailed": "Не удалось загрузить видео.",
+
+  "authErrorGeneric": "Ошибка авторизации. Пожалуйста, перезапустите приложение."
+}

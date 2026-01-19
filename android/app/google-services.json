@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "540952718446",
+    "firebase_url": "https://device-streaming-b7af43e8-default-rtdb.firebaseio.com",
+    "project_id": "device-streaming-b7af43e8",
+    "storage_bucket": "device-streaming-b7af43e8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:540952718446:android:f3809446a6a57ffedb8a7f",
+        "android_client_info": {
+          "package_name": "com.example.course"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC0VSbX7lmuJO80rYgaX1KUr6iejMbjOaY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
