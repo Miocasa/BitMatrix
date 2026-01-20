@@ -1,3 +1,4 @@
+import 'package:bitmatrix/providers/settings_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:bitmatrix/providers/theme_provider.dart';
@@ -9,8 +10,11 @@ import 'package:bitmatrix/generated/app_localizations.dart';
 
 void main() {
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => ThemeProvider(),
+    MultiProvider(providers:
+      [
+        ChangeNotifierProvider(create: (_) => ThemeProvider(),),
+        ChangeNotifierProvider(create: (_) => SettingsProvider(),),
+      ],
       child: const MyApp(),
     ),
   );

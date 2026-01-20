@@ -143,7 +143,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeSettingsTooltip => 'Settings';
 
   @override
-  String get homeNoCourses => 'No courses available. Try adding sample data.';
+  String get homeNoCourses => 'No bitmaps available. Try adding sample data.';
 
   @override
   String homeNoCoursesForQuery(String query) {

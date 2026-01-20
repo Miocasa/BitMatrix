@@ -8,19 +8,15 @@ import 'dart:math' as math;
 import 'package:bitmatrix/screens/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:m3e_collection/m3e_collection.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:file_picker/file_picker.dart';
-
 import 'package:m3e_design/m3e_design.dart';
 import 'package:app_bar_m3e/app_bar_m3e.dart';
 import 'package:button_m3e/button_m3e.dart';
 import 'package:icon_button_m3e/icon_button_m3e.dart';
 import 'package:fab_m3e/fab_m3e.dart';
 import 'package:loading_indicator_m3e/loading_indicator_m3e.dart';
-
-// Предполагается, что SettingsScreen существует
-// import 'package:bitmatrix/screens/settings_screen.dart';
+import 'package:provider/provider.dart';
 
 class PixelArtEditorScreen extends StatefulWidget {
   const PixelArtEditorScreen({
@@ -49,25 +45,21 @@ class _PixelArtEditorScreenState extends State<PixelArtEditorScreen> {
   final List<List<List<Color?>>> _undoStack = [];
   final List<List<List<Color?>>> _redoStack = [];
   static const int _maxHistory = 64;
-
   bool _showGrid = true;
   bool _isLoading = false;
 
   late double _pixelScale;
-
-  int _pixelsVersion = 0;
 
   @override
   void initState() {
     super.initState();
     _pixelScale = _calculatePixelScale(widget.initialWidth, widget.initialHeight);
 
-    pixels = widget.initialPixels != null
-        ? widget.initialPixels!
-        : List.generate(
-      widget.initialHeight,
-          (_) => List<Color?>.filled(widget.initialWidth, null),
-    );
+    if (widget.initialPixels != null) {
+      pixels = widget.initialPixels!;
+    } else {
+      _initEmptyCanvas();
+    }
 
     _saveStateForUndo();
   }
@@ -78,38 +70,56 @@ class _PixelArtEditorScreenState extends State<PixelArtEditorScreen> {
     super.dispose();
   }
 
-  double _calculatePixelScale(int w, int h) {
-    const double targetSize = 400.0;
-    final maxDim = math.max(w, h);
-    return (targetSize / maxDim).clamp(3.0, 32.0);
+  // Вычисление адаптивного pixelScale в зависимости от размера холста
+  double _calculatePixelScale(int width, int height) {
+    // Целевой размер canvas в логических пикселях (примерно)
+    const double targetSize = 384.0;
+
+    final int maxDimension = math.max(width, height);
+    double scale = targetSize / maxDimension;
+
+    // Ограничиваем масштаб в разумных пределах
+    // Для маленьких холстов - больше, для больших - меньше
+    return scale.clamp(4.0, 24.0);
+  }
+
+  void _initEmptyCanvas() {
+    pixels = List.generate(
+      widget.initialHeight,
+          (_) => List<Color?>.filled(widget.initialWidth, null),
+    );
   }
 
   void _saveStateForUndo() {
     final snapshot = pixels.map((row) => List<Color?>.from(row)).toList();
+
     _undoStack.add(snapshot);
     if (_undoStack.length > _maxHistory) {
       _undoStack.removeAt(0);
     }
+
     _redoStack.clear();
   }
 
   void _undo() {
     if (_undoStack.length <= 1) return;
+
     final current = pixels.map((row) => List<Color?>.from(row)).toList();
     _redoStack.add(current);
+
     setState(() {
       pixels = _undoStack.removeLast();
-      _pixelsVersion++;
     });
   }
 
   void _redo() {
     if (_redoStack.isEmpty) return;
+
     final current = pixels.map((row) => List<Color?>.from(row)).toList();
     _undoStack.add(current);
+
     setState(() {
       pixels = _redoStack.removeLast();
-      _pixelsVersion++;
     });
   }
 
@@ -137,27 +147,26 @@ class _PixelArtEditorScreenState extends State<PixelArtEditorScreen> {
       "lastModified": now,
       "pixels": pixels.map((row) => row.map((c) => c?.value).toList()).toList(),
     };
-
     String? jsonPath = await FilePicker.platform.saveFile(
-      dialogTitle: 'Select output file',
-      fileName: 'pixelart_${now.replaceAll(':', '-')}.json',
+      dialogTitle: 'Please select an output file:',
+      fileName: 'bitmap.json',
     );
 
     if (jsonPath == null) {
       _showFileSaveAlternativeDialog(basePath, projectData);
     } else {
-      await _saveToFile(jsonPath, projectData);
+      _saveToFile(jsonPath, projectData);
     }
   }
 
-  Future<void> _saveToFile(String path, Map<String, Object> data) async {
-    await File(path).writeAsString(
-      const JsonEncoder.withIndent('  ').convert(data),
+  Future<void> _saveToFile(String jsonPath, Map<String, Object> projectData) async{
+    await File(jsonPath).writeAsString(
+      const JsonEncoder.withIndent('  ').convert(projectData),
     );
 
-    final png = await _capturePng();
-    if (png != null) {
-      await File(path.replaceAll('.json', '.png')).writeAsBytes(png);
+    final pngBytes = await _capturePng();
+    if (pngBytes != null) {
+      await File(jsonPath.replaceAll('.json', '.png')).writeAsBytes(pngBytes);
     }
 
     setState(() => _isLoading = false);
@@ -165,7 +174,7 @@ class _PixelArtEditorScreenState extends State<PixelArtEditorScreen> {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Saved: ${path.split(Platform.pathSeparator).last}'),
+        content: Text('Сохранено: ${jsonPath.split('/').last}'),
         behavior: SnackBarBehavior.floating,
         backgroundColor: Colors.green.shade800,
       ),
@@ -206,6 +215,7 @@ class _PixelArtEditorScreenState extends State<PixelArtEditorScreen> {
       final loadedWidth = json['width'] as int;
       final loadedHeight = json['height'] as int;
 
+      // Проверка допустимых размеров
       if (loadedWidth < 1 || loadedWidth > 256 || loadedHeight < 1 || loadedHeight > 256) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -225,6 +235,7 @@ class _PixelArtEditorScreenState extends State<PixelArtEditorScreen> {
         }).toList();
       }).toList();
 
+      // Если размеры отличаются, предложить открыть в новом холсте
       if (loadedWidth != widget.initialWidth || loadedHeight != widget.initialHeight) {
         if (mounted) {
           final shouldOpenNewCanvas = await showDialog<bool>(
@@ -252,6 +263,7 @@ class _PixelArtEditorScreenState extends State<PixelArtEditorScreen> {
           );
 
           if (shouldOpenNewCanvas == true) {
+            // Открываем в новом холсте с загруженными пикселями
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(
                 builder: (context) => PixelArtEditorScreen(
@@ -263,14 +275,14 @@ class _PixelArtEditorScreenState extends State<PixelArtEditorScreen> {
             );
             return;
           } else {
-            return;
+            return; // Пользователь отменил
           }
         }
       }
 
+      // Если размеры совпадают, загружаем как обычно
       setState(() {
         pixels = loadedPixels;
-        _pixelsVersion++;
       });
 
       _undoStack.clear();
@@ -302,24 +314,20 @@ class _PixelArtEditorScreenState extends State<PixelArtEditorScreen> {
   void _showClearConfirmation() {
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
+      builder: (context) => AlertDialog(
         title: const Text('Очистить холст?'),
         content: const Text('Все несохранённые изменения будут потеряны.'),
         actions: [
           ButtonM3E(
-            onPressed: () => Navigator.pop(ctx),
+            onPressed: () => Navigator.of(context).pop(),
             style: ButtonM3EStyle.text,
             label: const Text('Отмена'),
           ),
           ButtonM3E(
             onPressed: () {
-              Navigator.pop(ctx);
+              Navigator.of(context).pop();
               setState(() {
-                pixels = List.generate(
-                  widget.initialHeight,
-                      (_) => List<Color?>.filled(widget.initialWidth, null),
-                );
-                _pixelsVersion++;
+                _initEmptyCanvas();
                 _undoStack.clear();
                 _redoStack.clear();
                 _saveStateForUndo();
@@ -333,16 +341,16 @@ class _PixelArtEditorScreenState extends State<PixelArtEditorScreen> {
     );
   }
 
-  void _showFileSaveAlternativeDialog(String basePath, Map<String, Object> data) {
+  void _showFileSaveAlternativeDialog(String? basePath,Map<String, Object> projectData) {
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
+      builder: (context) => AlertDialog(
         title: const Text('Сохранить файл?'),
         content: const Text('Вы не выбрали файл, хотите сохранить его с названием по умолчанию?'),
         actions: [
           ButtonM3E(
             onPressed: () {
-              Navigator.pop(ctx);
+              Navigator.of(context).pop();
               setState(() => _isLoading = false);
             },
             style: ButtonM3EStyle.text,
@@ -350,9 +358,9 @@ class _PixelArtEditorScreenState extends State<PixelArtEditorScreen> {
           ),
           ButtonM3E(
             onPressed: () {
-              Navigator.pop(ctx);
-              final path = '$basePath/pixelart_${DateTime.now().millisecondsSinceEpoch}.json';
-              _saveToFile(path, data);
+              Navigator.of(context).pop();
+              final jsonPath = '$basePath/pixelart_${DateTime.now().millisecondsSinceEpoch}.json';
+              _saveToFile(jsonPath, projectData);
             },
             style: ButtonM3EStyle.filled,
             label: const Text('Да'),
@@ -479,37 +487,39 @@ class _PixelArtEditorScreenState extends State<PixelArtEditorScreen> {
   }
 
   void _drawPixel(int x, int y) {
-    if (x < 0 || x >= widget.initialWidth || y < 0 || y >= widget.initialHeight) {
-      return;
-    }
-    if (pixels[y][x] == selectedColor) {
-      return;
-    }
+    if (x < 0 || x >= widget.initialWidth || y < 0 || y >= widget.initialHeight) return;
+    if (pixels[y][x] == selectedColor) return;
 
     _saveStateForUndo();
+
     setState(() {
       pixels[y][x] = selectedColor;
-      _pixelsVersion++;
     });
   }
 
   void _handleDraw(Offset localPosition) {
-    final px = _pixelScale;
-    final gx = (localPosition.dx / px).floor();
-    final gy = (localPosition.dy / px).floor();
-    _drawPixel(gx, gy);
+    final double pixelSize = _pixelScale;
+
+    final int gridX = (localPosition.dx / pixelSize).floor();
+    final int gridY = (localPosition.dy / pixelSize).floor();
+
+    _drawPixel(gridX, gridY);
   }
 
   void _zoomIn() {
-    final cur = _transformationController.value.getMaxScaleOnAxis();
-    final next = (cur * 1.5).clamp(0.25, 64.0);
-    _transformationController.value = Matrix4.identity()..scale(next);
+    final currentScale = _transformationController.value.getMaxScaleOnAxis();
+    final newScale = (currentScale * 1.5).clamp(0.25, 64.0);
+
+    final newMatrix = Matrix4.identity()..scale(newScale);
+    _transformationController.value = newMatrix;
   }
 
   void _zoomOut() {
-    final cur = _transformationController.value.getMaxScaleOnAxis();
-    final next = (cur / 1.5).clamp(0.25, 64.0);
-    _transformationController.value = Matrix4.identity()..scale(next);
+    final currentScale = _transformationController.value.getMaxScaleOnAxis();
+    final newScale = (currentScale / 1.5).clamp(0.25, 64.0);
+
+    final newMatrix = Matrix4.identity()..scale(newScale);
+    _transformationController.value = newMatrix;
   }
 
   void _resetZoom() {
@@ -518,6 +528,8 @@ class _PixelArtEditorScreenState extends State<PixelArtEditorScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
       appBar: AppBarM3E(
         title: const Text('Pixel Art Editor'),
@@ -586,34 +598,32 @@ class _PixelArtEditorScreenState extends State<PixelArtEditorScreen> {
                   transformationController: _transformationController,
                   minScale: 0.25,
                   maxScale: 64.0,
-                  boundaryMargin: const EdgeInsets.all(160),
+                  boundaryMargin: const EdgeInsets.all(200),
                   panEnabled: true,
                   scaleEnabled: true,
                   clipBehavior: Clip.none,
                   child: Center(
                     child: Card(
-                      elevation: 6,
+                      elevation: 8,
                       clipBehavior: Clip.antiAlias,
-                      color: const Color(0xFF0F0F0F),
                       child: SizedBox(
                         width: widget.initialWidth * _pixelScale,
                         height: widget.initialHeight * _pixelScale,
                         child: GestureDetector(
                           behavior: HitTestBehavior.opaque,
-                          onTapDown: (d) => _handleDraw(d.localPosition),
-                          onPanStart: (d) => _handleDraw(d.localPosition),
-                          onPanUpdate: (d) => _handleDraw(d.localPosition),
+                          onPanStart: (details) => _handleDraw(details.localPosition),
+                          onPanUpdate: (details) => _handleDraw(details.localPosition),
+                          onTapDown: (details) => _handleDraw(details.localPosition),
                           onDoubleTap: _undo,
                           child: RepaintBoundary(
                             key: _repaintKey,
                             child: CustomPaint(
                               painter: _PixelPainter(
-                                pixels: pixels,
-                                width: widget.initialWidth,
-                                height: widget.initialHeight,
-                                showGrid: _showGrid,
-                                pixelScale: _pixelScale,
-                                version: _pixelsVersion,
+                                pixels,
+                                widget.initialWidth,
+                                widget.initialHeight,
+                                _showGrid,
+                                _pixelScale,
                               ),
                             ),
                           ),
@@ -625,27 +635,12 @@ class _PixelArtEditorScreenState extends State<PixelArtEditorScreen> {
               ),
 
               // Zoom controls
-              // IntrinsicWidth(
-              //   child: ToolbarM3E(
-              //     size: ToolbarM3ESize.large,
-              //     variant: ToolbarM3EVariant.surface,
-              //     shapeFamily: ToolbarM3EShapeFamily.round,
-              //
-              //     actions: [
-              //       ToolbarActionM3E(icon: Icons.zoom_in, onPressed: () => {}),
-              //       ToolbarActionM3E(icon: Icons.zoom_in, onPressed: () => {}),
-              //     ],
-              //   ),
-              // ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Card(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(100),
-                      ),
                       elevation: 2,
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -764,16 +759,21 @@ class _PixelArtEditorScreenState extends State<PixelArtEditorScreen> {
             ],
           ),
 
+          // Loading indicator
           if (_isLoading)
             Container(
               color: Colors.black54,
-              child: const Center(child: LoadingIndicatorM3E()),
+              child: const Center(
+                child: LoadingIndicatorM3E(
+                  variant: LoadingIndicatorM3EVariant.contained,
+                ),
+              ),
             ),
         ],
       ),
       floatingActionButton: FabM3E(
         onPressed: _saveProject,
-        tooltip: 'Quick save',
+        tooltip: 'Быстрое сохранение',
         icon: const Icon(Icons.save),
       ),
     );
@@ -810,44 +810,43 @@ class _PixelPainter extends CustomPainter {
   final int height;
   final bool showGrid;
   final double pixelScale;
-  final int version;
 
-  _PixelPainter({
-    required this.pixels,
-    required this.width,
-    required this.height,
-    required this.showGrid,
-    required this.pixelScale,
-    required this.version,
-  });
+  _PixelPainter(this.pixels, this.width, this.height, this.showGrid, this.pixelScale);
 
   @override
   void paint(Canvas canvas, Size size) {
+    // ИСПРАВЛЕНИЕ: используем pixelScale напрямую вместо вычисления из size
+    // Это предотвращает накопление ошибки округления
     final pw = pixelScale;
     final ph = pixelScale;
 
-    // Background
+    // Фон
     canvas.drawColor(const Color(0xFF0F0F0F), BlendMode.src);
 
-    // Pixels
+    // Пиксели - используем точные координаты для каждого пикселя
     final paint = Paint()..style = PaintingStyle.fill;
     for (int y = 0; y < height; y++) {
       for (int x = 0; x < width; x++) {
         final color = pixels[y][x];
         if (color != null) {
           paint.color = color;
-          canvas.drawRect(Rect.fromLTWH(x * pw, y * ph, pw, ph), paint);
+          // Точные координаты: каждый пиксель начинается ровно в x*pw, y*ph
+          canvas.drawRect(
+            Rect.fromLTWH(x * pw, y * ph, pw, ph),
+            paint,
+          );
         }
       }
     }
 
-    // Grid (if shown and scale allows visibility)
+    // Сетка
     if (showGrid && pw >= 2.0) {
       final gridPaint = Paint()
         ..color = const Color(0xFF2A2A2A)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 1.0;
 
+      // Рисуем линии сетки по точным координатам
       for (int i = 0; i <= height; i++) {
         final yPos = i * ph;
         canvas.drawLine(Offset(0, yPos), Offset(width * pw, yPos), gridPaint);
@@ -861,11 +860,7 @@ class _PixelPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _PixelPainter oldDelegate) {
-    return oldDelegate.version != version ||
-        oldDelegate.showGrid != showGrid ||
-        oldDelegate.pixelScale != pixelScale;
-  }
+  bool shouldRepaint(covariant _PixelPainter oldDelegate) => true;
 }
 
 class _QuickSizeChip extends StatelessWidget {

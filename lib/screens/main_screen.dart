@@ -1,20 +1,27 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 
 import 'package:bitmatrix/bitmap-tools/canvas_screen.dart';
 import 'package:bitmatrix/generated/app_localizations.dart';
+import 'package:bitmatrix/providers/settings_provider.dart';
 import 'package:bitmatrix/screens/home_tab.dart';
 import 'package:bitmatrix/screens/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:m3e_collection/m3e_collection.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
 
 import '../models/bitmap_card.dart';
+import 'package:path/path.dart' as p;
 
 // Placeholder-функция для тестовых данных
+
+
 List<BitmapFile> getPlaceholderBitmapFiles() {
 
   return [
     BitmapFile(
-      path: '1',
       title: 'Test Bitmap 1',
       description: 'This is a sample bitmap file for drawing.',
       filePath: 'assets/bitmaps/test1.png',
@@ -22,7 +29,6 @@ List<BitmapFile> getPlaceholderBitmapFiles() {
       editedAt: DateTime.now(),
     ),
     BitmapFile(
-      path: '2',
       title: 'Test Bitmap 2',
       description: 'Another sample bitmap file for demonstration.',
       filePath: 'assets/bitmaps/test2.png',
@@ -62,8 +68,8 @@ class _MainScreenState extends State<MainScreen> {
   final Debouncer _debouncer = Debouncer(milliseconds: 500);
 
   String _searchQuery = "";
-  List<BitmapFile> _allBitmapFiles = [];
-  List<BitmapFile> _filteredBitmapFiles = [];
+  List<BitmapFile> _allBitmaps = [];
+  List<BitmapFile> _filteredBitmaps = [];
   bool _isLoading = true;
   bool _isSearching = false;
 
@@ -135,13 +141,74 @@ class _MainScreenState extends State<MainScreen> {
     super.dispose();
   }
 
+  Future<List<String>> _listFilesInFolder() async {
+    if (!mounted) return [];
+
+    final settings = context.read<SettingsProvider>();
+    final folderPath = settings.storageFolder.isNotEmpty
+        ? settings.storageFolder
+        : (await getApplicationDocumentsDirectory()).path;
+
+    final dir = Directory(folderPath);
+    if (!await dir.exists()) return [];
+
+    final List<String> validFiles = [];
+
+    await for (final entity in dir.list(followLinks: false)) {
+      if (entity is! File) continue;
+
+      final path = entity.path;
+      final name = p.basename(path);
+
+      // Optional: stricter filter by extension
+      if (!name.endsWith('.json') && !name.endsWith('.bitmap')) continue;
+
+      try {
+        final content = await entity.readAsString();
+        final json = jsonDecode(content) as Map<String, dynamic>;
+
+        if (json.containsKey('pixels') &&
+            json.containsKey('width') &&
+            json.containsKey('height')) {
+          validFiles.add(path);   // ← full path!
+        }
+      } catch (e) {
+        // silently skip invalid / broken files
+      }
+    }
+
+    return validFiles;
+  }
+  DateTime? _parseDate(dynamic value) {
+    if (value == null) return null;
+    if (value is String) return DateTime.tryParse(value);
+    return null;
+  }
+
   void _loadBitmapFiles() async {
     setState(() => _isLoading = true);
-    final bitmapFiles = getPlaceholderBitmapFiles();
+    final bitmapFiles = await _listFilesInFolder();
+    String _filePath;
+    List<BitmapFile> _bitmaps = [];
+
+    for (final path in bitmapFiles) {   // ← path is already absolute
+      final file = File(path);
+      final content = await file.readAsString();
+      final json = jsonDecode(content) as Map<String, dynamic>;
+
+      _bitmaps.add(BitmapFile(
+        filePath: path,                    // full path
+        title: json['title'] as String? ?? "Untitled",
+        description: json['description'] as String? ?? "",
+        createdAt: _parseDate(json['created']),
+        editedAt: _parseDate(json['lastModified']),
+      ));
+    }
+
     if (mounted) {
       setState(() {
-        _allBitmapFiles = bitmapFiles;
-        _filteredBitmapFiles = bitmapFiles;
+        _allBitmaps = _bitmaps;
+        _filteredBitmaps = _bitmaps;
         _isLoading = false;
       });
     }
@@ -162,9 +229,9 @@ class _MainScreenState extends State<MainScreen> {
 
   void _filterBitmapFiles() {
     if (_searchQuery.isEmpty) {
-      _filteredBitmapFiles = List.from(_allBitmapFiles);
+      _filteredBitmaps = List.from(_allBitmaps);
     } else {
-      _filteredBitmapFiles = _allBitmapFiles.where((bitmap) {
+      _filteredBitmaps = _allBitmaps.where((bitmap) {
         final titleMatch = bitmap.title.toLowerCase().contains(_searchQuery);
         final descriptionMatch =
         bitmap.description.toLowerCase().contains(_searchQuery);
@@ -262,9 +329,9 @@ class _MainScreenState extends State<MainScreen> {
     final homeScreen = HomeScreen(
       isLoading: _isLoading,
       isSearching: _isSearching,
-      allBitmapFiles: _allBitmapFiles,
+      allBitmapFiles: _allBitmaps,
       searchQuery: _searchQuery,
-      filteredBitmapFiles: _filteredBitmapFiles,
+      filteredBitmapFiles: _filteredBitmaps,
     );
 
     final screens = [
@@ -300,10 +367,34 @@ class _MainScreenState extends State<MainScreen> {
     } else {
       bodyContent = screens[_selectedIndex];
     }
-
+    
+    final settings = context.read<SettingsProvider>();
+    
+    List<FabMenuItem> fabItems = [
+      FabMenuItem(
+        icon: Icon(Icons.close),
+        label: Text("Close"),
+        onPressed: () => {}
+      ),
+      FabMenuItem(
+          icon: Icon(Icons.find_replace),
+          label: Text("Find"),
+          onPressed: () => {}
+      ),
+      FabMenuItem(
+          icon: Icon(Icons.add),
+          label: Text("Set path"),
+          onPressed: () async { await settings.setStorageFolder("/home/miocasa/Documents"); }
+      ),
+    ];
     return Scaffold(
       appBar: _buildAppBar(context),
       body: bodyContent,
+      floatingActionButton: FabMenuM3E(
+        primaryFab: FabM3E(
+          icon: Icon(Icons.settings)),
+        items: fabItems,
+      ),
       bottomNavigationBar: !useRail
         ? NavigationBar(
           selectedIndex: _selectedIndex,

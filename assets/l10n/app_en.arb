@@ -53,7 +53,7 @@
   "homeSearchClearTooltip": "Clear Search",
   "homeSearchTooltip": "Search Courses",
   "homeSettingsTooltip": "Settings",
-  "homeNoCourses": "No courses available. Try adding sample data.",
+  "homeNoCourses": "No bitmaps available. Try adding sample data.",
   "homeNoCoursesForQuery": "No courses found for \"{query}\".",
   "@homeNoCoursesForQuery": {
     "placeholders": {

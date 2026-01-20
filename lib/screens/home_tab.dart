@@ -1,17 +1,17 @@
 import 'package:bitmatrix/generated/app_localizations.dart';
 import 'package:bitmatrix/models/bitmap_card.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:loading_indicator_m3e/loading_indicator_m3e.dart';
 
-class HomeScreen extends StatelessWidget {  // Changed to StatelessWidget for efficient prop-based rebuilding.
+class HomeScreen extends StatelessWidget {
   final bool isLoading;
   final bool isSearching;
   final String searchQuery;
   final List<BitmapFile> filteredBitmapFiles;
   final List<BitmapFile> allBitmapFiles;
 
-  const HomeScreen({  // Updated constructor to use const for optimization.
+  const HomeScreen({
     super.key,
     required this.isLoading,
     required this.isSearching,
@@ -20,54 +20,35 @@ class HomeScreen extends StatelessWidget {  // Changed to StatelessWidget for ef
     required this.filteredBitmapFiles,
   });
 
-  int getCrossAxisCount(double width) {
-    if (width < 600)   return 1;   // мобильный
-    if (width < 900)   return 2;   // узкий планшет / портретный большой телефон
-    if (width < 1200)  return 3;
-    if (width < 1500)  return 4;
-    if (width < 1800)  return 5;
-    if (width < 2100)  return 6;
-    if (width < 2400)  return 7;
-    return 8;                      // очень широкие экраны
+  int _getCrossAxisCount(double width) {
+    if (width < 600) return 1;
+    if (width < 900) return 2;
+    if (width < 1200) return 3;
+    if (width < 1500) return 4;
+    if (width < 1800) return 5;
+    return 6;
   }
-  double getCardAspectRatio(double width) {
-    final widget_width = width / getCrossAxisCount(width);
-    if (widget_width <= 420)   return 1;   // мобильный
-    if (widget_width > 420 && widget_width <= 500)   return 1.2;   // мобильный
-    else return 1.3;
-  }
-
-  // void _loadAllFiles() async {
-  //   // setState(() => {
-  //   //
-  //   // });
-  // }
-
-
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   _searchController.addListener(_onSearchChanged);
-  //   _loadAllCourses();
-  //   _listenToEnrollments();
-  // }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final width = MediaQuery.sizeOf(context).width;
 
-    if (isLoading) {  // Access props directly via 'this.' (no separate state fields).
+    if (isLoading) {
       return const Center(
-        child: CircularProgressIndicator(key: Key("bitmap_files_loading")),
+        child: SizedBox(
+          width: 96,
+          height: 96,
+          child: LoadingIndicatorM3E(
+            variant: LoadingIndicatorM3EVariant.defaultStyle,
+            key: Key("bitmap_files_loading"),
+          ),
+        ),
       );
     }
 
     if (allBitmapFiles.isEmpty && !isLoading) {
-      return Center(
-        child: Text(
-          l10n.homeNoCourses,
-        ), // Адаптируем локализацию под новые данные
-      );
+      return Center(child: Text(l10n.homeNoCourses));
     }
 
     if (searchQuery.isNotEmpty && filteredBitmapFiles.isEmpty) {
@@ -91,33 +72,32 @@ class HomeScreen extends StatelessWidget {  // Changed to StatelessWidget for ef
       );
     }
 
-    // ListView для отображения списка BitmapFileCard
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        // Логика количества колонок в зависимости от ширины экрана
-        final Size size = MediaQuery.of(context).size;
-        final double width = size.width;
-        final double height = size.height;
+    final crossCount = _getCrossAxisCount(width);
 
-        return MasonryGridView.count(
-          crossAxisCount: getCrossAxisCount(MediaQuery.sizeOf(context).width),
-          mainAxisSpacing: 16,
-          crossAxisSpacing: 16,
-          itemCount: filteredBitmapFiles.length + 1,
-          itemBuilder: (context, index) {
-            if(index == 2){
-              return Text("Width = ${width}, Height = ${height}");
-            }
-            final bitmapFile = filteredBitmapFiles[index];
-            return BitmapFileCard(
-              bitmapFile: bitmapFile,
-              onTap: () {
-                FocusScope.of(context).unfocus();
-              },
-            );
-          },
-        );
-      },
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: MasonryGridView.count(
+        crossAxisCount: crossCount,
+        mainAxisSpacing: 16,
+        crossAxisSpacing: 16,
+        itemCount: filteredBitmapFiles.length,
+        // ↓ Masonry-эффект работает лучше без itemExtent / без фиксированной высоты
+        itemBuilder: (context, index) {
+          final bitmap = filteredBitmapFiles[index];
+
+          // Для демонстрации masonry-эффекта можно сделать высоту немного случайной
+          // В реальном проекте высота должна определяться содержимым карточки
+          final baseHeight = 180.0;
+          // Пример: длинные описания → выше карточка
+          final extra = bitmap.description.length > 80 ? 60.0 : 0.0;
+          // Или полностью динамическая высота через LayoutBuilder / IntrinsicHeight (см. ниже)
+
+          return SizedBox(
+            // height: baseHeight + extra + (index % 4) * 30, // ← тестовая вариация
+            child: BitmapFileCard(bitmapFile: bitmap),
+          );
+        },
+      ),
     );
   }
 }

@@ -365,7 +365,7 @@ abstract class AppLocalizations {
   /// No description provided for @homeNoCourses.
   ///
   /// In en, this message translates to:
-  /// **'No courses available. Try adding sample data.'**
+  /// **'No bitmaps available. Try adding sample data.'**
   String get homeNoCourses;
 
   /// No description provided for @homeNoCoursesForQuery.
